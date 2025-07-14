@@ -1,0 +1,16 @@
+{application, rebar_elixir_uuid_demo, [
+    {description, "Demonstration of using the Elixir UUID library from Erlang"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {rebar_elixir_uuid_demo_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        elixir
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache 2.0"]},
+    {links, []}
+]}.
+
