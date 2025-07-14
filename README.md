@@ -147,7 +147,3 @@ generate_v5_uuid() ->
     'Elixir.UUID':uuid5(Namespace, Name).
 ```
 
-## License
-
-This project is released under the MIT License.
-
