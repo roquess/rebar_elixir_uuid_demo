@@ -32,7 +32,7 @@ The project shows how to:
 ]}.
 
 {deps, [
-    {uuid, "1.1.8"}
+    {elixir_uuid, "1.2.1"}
 ]}.
 
 {shell, [

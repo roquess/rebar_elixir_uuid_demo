@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using Elixir Libraries in Erlang with rebar_mix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --accent: #667eea;
+            --accent-light: #f0f4ff;
+            --code-bg: #1a202c;
+            --border: #e2e8f0;
+            --success: #48bb78;
+            --info: #4299e1;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --accent-light: #2d3748;
+            --border: #4a5568;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            padding: 3rem 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .header-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin: 3rem 0 1.5rem 0;
+            color: var(--text-primary);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--accent);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .info-box {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0.25rem;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .success-box {
+            background: #f0fff4;
+            border-left: 4px solid var(--success);
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0.25rem;
+        }
+
+        [data-theme="dark"] .success-box {
+            background: #1a2e1a;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .inline-code {
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+
+        .step {
+            margin: 2rem 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 2rem;
+            font-weight: bold;
+            margin-right: 0.75rem;
+        }
+
+        .key-concept {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin: 2rem 0;
+        }
+
+        .key-concept h3 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        .github-link:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+
+    <div class="container">
+        <header>
+            <h1>Using Elixir Libraries in Erlang</h1>
+            <p class="header-subtitle">A practical guide to integrating Elixir dependencies into Erlang projects with rebar_mix</p>
+            <div class="meta">
+                <div class="meta-item">
+                    <span>📘</span>
+                    <span>Tutorial & Demo</span>
+                </div>
+                <div class="meta-item">
+                    <span>🔧</span>
+                    <span>Erlang ↔ Elixir</span>
+                </div>
+                <div class="meta-item">
+                    <span>⚡</span>
+                    <span>rebar3 + rebar_mix</span>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>What This Demonstrates</h2>
+            <p>This repository shows a practical example of how to use <strong>Elixir libraries</strong> within an <strong>Erlang application</strong>. Specifically, it demonstrates using Elixir's UUID library from Erlang code via the <span class="inline-code">rebar_mix</span> plugin.</p>
+            
+            <div class="info-box">
+                <p><strong>Why is this useful?</strong></p>
+                <p>The Elixir ecosystem has many excellent libraries. Instead of rewriting them in Erlang or managing two separate projects, you can directly use Elixir libraries in your Erlang codebase with minimal setup.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>How It Works</h2>
+            
+            <div class="key-concept">
+                <h3>The Bridge: rebar_mix Plugin</h3>
+                <p>The <span class="inline-code">rebar_mix</span> plugin allows rebar3 (Erlang's build tool) to understand and compile Elixir dependencies. It:</p>
+                <ul>
+                    <li>Finds and installs Elixir libraries specified in your deps</li>
+                    <li>Compiles them alongside your Erlang code</li>
+                    <li>Makes Elixir modules accessible from Erlang</li>
+                </ul>
+            </div>
+
+            <h3>The Magic Syntax</h3>
+            <p>To call an Elixir module from Erlang, simply prefix it with <span class="inline-code">'Elixir.'</span>:</p>
+
+            <pre><code><span class="comment">%% In Elixir:</span>
+UUID.uuid4()
+
+<span class="comment">%% In Erlang:</span>
+'Elixir.UUID':uuid4()</code></pre>
+        </section>
+
+        <section>
+            <h2>Step-by-Step Setup</h2>
+
+            <div class="step">
+                <h3><span class="step-number">1</span>Configure rebar.config</h3>
+                <p>Add the <span class="inline-code">rebar_mix</span> plugin and configure hooks:</p>
+                <pre><code>{erl_opts, [debug_info]}.
+
+<span class="comment">%% Add the rebar_mix plugin</span>
+{plugins, [
+    {rebar_mix, "0.4.0"}
+]}.
+
+<span class="comment">%% Configure hooks for compilation</span>
+{provider_hooks, [
+    {pre, [{compile, {mix, find_elixir_libs}}]},
+    {post, [{compile, {mix, consolidate_protocols}}]}
+]}.
+
+<span class="comment">%% Specify your Elixir dependencies</span>
+{deps, [
+    {elixir_uuid, "1.2.1"}  <span class="comment">%% Elixir UUID library</span>
+]}.</code></pre>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">2</span>Update Application Configuration</h3>
+                <p>In your <span class="inline-code">.app.src</span> file, add <span class="inline-code">elixir</span> to the applications list:</p>
+                <pre><code>{application, your_app, [
+    {applications, [
+        kernel,
+        stdlib,
+        elixir  <span class="comment">%% Add this</span>
+    ]},
+    ...
+]}.</code></pre>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">3</span>Call Elixir Functions from Erlang</h3>
+                <p>Now you can use the Elixir library in your Erlang code:</p>
+                <pre><code>-module(my_module).
+-export([generate_uuid/0]).
+
+generate_uuid() ->
+    <span class="comment">%% Call Elixir's UUID.uuid4()</span>
+    'Elixir.UUID':uuid4().
+    
+<span class="comment">%% Returns: "f47ac10b-58cc-4372-a567-0e02b2c3d479"</span></code></pre>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">4</span>Compile and Run</h3>
+                <pre><code>$ rebar3 compile
+$ rebar3 shell</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>Example Use Cases</h2>
+
+            <h3>Generate UUID v4 (String Format)</h3>
+            <pre><code>generate_uuid() ->
+    'Elixir.UUID':uuid4().
+<span class="comment">%% "f47ac10b-58cc-4372-a567-0e02b2c3d479"</span></code></pre>
+
+            <h3>Generate UUID v4 (Binary Format)</h3>
+            <pre><code>generate_binary_uuid() ->
+    'Elixir.UUID':uuid4(default).
+<span class="comment">%% <<244,122,193,11,88,204,67,114,165,103,14,2,178,195,212,121>></span></code></pre>
+
+            <h3>Generate UUID v1 with Metadata</h3>
+            <pre><code>generate_uuid_with_info() ->
+    UUID = 'Elixir.UUID':uuid1(),
+    'Elixir.UUID':info(UUID).
+    
+<span class="comment">%% Returns a map with UUID details:</span>
+<span class="comment">%% #{binary => &lt;&lt;...&gt;&gt;,</span>
+<span class="comment">%%   type => :uuid1,</span>
+<span class="comment">%%   uuid => "6be9714f-eb00-11e8-a051-001f70fbf214",</span>
+<span class="comment">%%   version => 1}</span></code></pre>
+        </section>
+
+        <section>
+            <h2>What You'll Learn</h2>
+            <ul>
+                <li>How to configure <span class="inline-code">rebar_mix</span> plugin in your Erlang project</li>
+                <li>The correct syntax for calling Elixir modules from Erlang</li>
+                <li>How to handle Elixir data types (atoms, maps, strings) in Erlang</li>
+                <li>Provider hooks for proper compilation order</li>
+                <li>Practical example with a real-world library (UUID)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Requirements</h2>
+            <ul>
+                <li><strong>Erlang/OTP</strong> 23 or newer</li>
+                <li><strong>Elixir</strong> 1.11 or newer</li>
+                <li><strong>rebar3</strong> build tool</li>
+            </ul>
+        </section>
+
+        <div class="success-box">
+            <p><strong>💡 Pro Tip:</strong> This pattern works with any Elixir library on Hex.pm. Just add it to your deps and prefix calls with <span class="inline-code">'Elixir.'</span> when calling from Erlang!</p>
+        </div>
+
+        <section>
+            <h2>Explore the Code</h2>
+            <p>Check out the full working example on GitHub:</p>
+            <a href="https://github.com/roquess/rebar_elixir_uuid_demo" class="github-link" target="_blank">
+                <span>📂</span>
+                <span>View Repository on GitHub</span>
+            </a>
+        </section>
+
+        <footer>
+            <p>Tutorial & Demo by <a href="https://github.com/roquess" style="color: var(--accent); text-decoration: none;">@roquess</a></p>
+            <p style="margin-top: 0.5rem;">Erlang ❤️ Elixir</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const btn = document.querySelector('.theme-toggle');
+            
+            html.setAttribute('data-theme', newTheme);
+            btn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    </script>
+</body>
+</html>
